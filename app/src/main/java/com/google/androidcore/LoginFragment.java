@@ -1,10 +1,12 @@
 package com.google.androidcore;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,7 +81,7 @@ public class LoginFragment extends Fragment {
         TextInputEditText textPassword = view.findViewById(R.id.password);
         Button btnLogin = view.findViewById(R.id.button);
 
-        btnLogin.setOnClickListener(v -> createToast(textEmail.getText().toString(), textPassword.getText().toString())
+        btnLogin.setOnClickListener(v -> createToast(view, textEmail.getText().toString(), textPassword.getText().toString())
         );
 
         txtAccount.setOnClickListener(v -> createSnackBar(view, textEmail.getText().toString(), textPassword.getText().toString()));
@@ -88,8 +90,25 @@ public class LoginFragment extends Fragment {
     }
 
     //creating toast message
-    public void createToast(String email, String password){
-        Toast.makeText(getContext(), "Email :- "+ email + "Password :- " + password, Toast.LENGTH_LONG).show();
+    @SuppressLint("SetTextI18n")
+    public void createToast(View view, String email, String password){
+//        Toast toast = Toast.makeText(getContext(), "Email :- "+ email + " Password :- " + password, Toast.LENGTH_LONG);
+//        toast.show();
+//        toast.setGravity(Gravity.TOP| Gravity.LEFT, 0, 0);//showing gravity
+
+        //creating custom toast
+        LayoutInflater layoutInflater = getLayoutInflater();
+        View layout = layoutInflater.inflate(R.layout.toast_layout, view.findViewById(R.id.custom_toast_container));
+
+        TextView text = layout.findViewById(R.id.text);
+        text.setText("Email :- "+ email + " Password :- " + password);
+
+        Toast toast = new Toast(view.getContext());
+        toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();
+
     }
 
     public void createSnackBar(View view, String email, String password){
