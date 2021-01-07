@@ -94,7 +94,7 @@ public class LoginFragment extends Fragment {
     public void createToast(View view, String email, String password){
 //        Toast toast = Toast.makeText(getContext(), "Email :- "+ email + " Password :- " + password, Toast.LENGTH_LONG);
 //        toast.show();
-//        toast.setGravity(Gravity.TOP| Gravity.LEFT, 0, 0);//showing gravity
+//        toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);//showing gravity
 
         //creating custom toast
         LayoutInflater layoutInflater = getLayoutInflater();
