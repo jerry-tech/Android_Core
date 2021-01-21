@@ -28,4 +28,5 @@
         android:name="com.google.androidcore.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" />
+
 </navigation>

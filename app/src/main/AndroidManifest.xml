@@ -9,11 +9,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidCore">
+        <activity android:name=".Dashboard"></activity>
+
         <provider
             android:name=".TestCoreProvider"
             android:authorities="com.google.androidcore.provider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
 
         <activity android:name=".MainActivity">
             <intent-filter>

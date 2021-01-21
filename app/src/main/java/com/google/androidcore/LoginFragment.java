@@ -1,9 +1,22 @@
 package com.google.androidcore;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDeepLink;
+import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.Navigation;
 
 import android.view.Gravity;
@@ -75,7 +88,6 @@ public class LoginFragment extends Fragment {
 
         txtAccount = view.findViewById(R.id.regAccount);
         //do no use lambda's for createNavigateOnClickListener
-//        txtAccount.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_loginFragment_to_registerFragment));
 
         TextInputEditText textEmail = view.findViewById(R.id.email);
         TextInputEditText textPassword = view.findViewById(R.id.password);
@@ -86,12 +98,77 @@ public class LoginFragment extends Fragment {
 
         txtAccount.setOnClickListener(v -> createSnackBar(view, textEmail.getText().toString(), textPassword.getText().toString()));
 
+        //adding Notification channel
+        createNotificationChannel(view);
+
+        //click listener to create Notification
+        TextView textNotify = view.findViewById(R.id.createNotify);
+        textNotify.setOnClickListener(v -> createNotification(savedInstanceState, view, "Dear " + textEmail.getText() + " your email has been verified and confirmed"));
+
         return view;
+    }
+
+    private void createNotification(Bundle bundle, View view, String text) {
+
+        //creating an intent for the notification
+        Intent dashBoardActivity = new Intent(view.getContext(), Dashboard.class);
+
+        String noteTitle = "LOGIN SUCCESSFUL";
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(view.getContext(), "My Notification")
+                .setSmallIcon(R.drawable.ic_baseline_sentiment_very_dissatisfied_24)
+                .setContentTitle(noteTitle)
+                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text).setBigContentTitle(noteTitle))
+                .setLargeIcon(BitmapFactory.decodeResource(view.getContext().getResources(), R.drawable.email))
+                //intent for main content
+                .setContentIntent(
+                        PendingIntent.getActivity(
+                                view.getContext(),
+                                0,
+                                dashBoardActivity,
+                                PendingIntent.FLAG_UPDATE_CURRENT)
+                )
+                //intent for bottom
+                .addAction(R.drawable.ic_baseline_send_24, "Send Now",
+                        PendingIntent.getActivity(
+                                view.getContext(),
+                                0,
+                                dashBoardActivity,
+                                PendingIntent.FLAG_UPDATE_CURRENT)
+                )
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);//first
+
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(1, builder.build());     //second
+    }
+
+    private void createNotificationChannel(View view) {//third
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "My Notification";
+            String description = "Just a test Notification";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("My Notification", name, importance);
+            channel.setDescription(description);
+            channel.enableLights(true);
+            channel.setLightColor(Color.RED);
+            channel.enableVibration(true);
+
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = view.getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     //creating toast message
     @SuppressLint("SetTextI18n")
-    public void createToast(View view, String email, String password){
+    public void createToast(View view, String email, String password) {
 //        Toast toast = Toast.makeText(getContext(), "Email :- "+ email + " Password :- " + password, Toast.LENGTH_LONG);
 //        toast.show();
 //        toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);//showing gravity
@@ -101,7 +178,7 @@ public class LoginFragment extends Fragment {
         View layout = layoutInflater.inflate(R.layout.toast_layout, view.findViewById(R.id.custom_toast_container));
 
         TextView text = layout.findViewById(R.id.text);
-        text.setText("Email :- "+ email + " Password :- " + password);
+        text.setText("Email :- " + email + " Password :- " + password);
 
         Toast toast = new Toast(view.getContext());
         toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
@@ -111,7 +188,7 @@ public class LoginFragment extends Fragment {
 
     }
 
-    public void createSnackBar(View view, String email, String password){
-        Snackbar.make(view, "Email :- "+ email + "Password :- " + password, Snackbar.LENGTH_LONG).show();
+    public void createSnackBar(View view, String email, String password) {
+        Snackbar.make(view, "Email :- " + email + "Password :- " + password, Snackbar.LENGTH_LONG).show();
     }
 }

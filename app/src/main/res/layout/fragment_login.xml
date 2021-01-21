@@ -78,5 +78,20 @@
         android:gravity="right"
         android:focusable="true" />
 
+    <TextView
+        android:id="@+id/createNotify"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="end"
+        android:textStyle="bold"
+        android:padding="10dp"
+        android:text="@string/create_notification_now"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/regAccount"
+        app:layout_constraintStart_toStartOf="@+id/regAccount"
+        app:layout_constraintTop_toBottomOf="@+id/regAccount" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
