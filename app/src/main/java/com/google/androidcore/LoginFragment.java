@@ -14,6 +14,7 @@ import android.os.Bundle;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDeepLink;
 import androidx.navigation.NavDeepLinkBuilder;
@@ -30,6 +31,8 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.androidcore.ViewModel.RegisterViewModel;
+import com.google.androidcore.models.Register;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +42,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class LoginFragment extends Fragment {
 
     TextView txtAccount;
+    RegisterViewModel registerViewModel;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -86,6 +90,8 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        registerViewModel = ViewModelProviders.of(this).get(RegisterViewModel.class);
+
         txtAccount = view.findViewById(R.id.regAccount);
         //do no use lambda's for createNavigateOnClickListener
 
@@ -93,33 +99,44 @@ public class LoginFragment extends Fragment {
         TextInputEditText textPassword = view.findViewById(R.id.password);
         Button btnLogin = view.findViewById(R.id.button);
 
+
         btnLogin.setOnClickListener(v -> createToast(view, textEmail.getText().toString(), textPassword.getText().toString())
         );
 
         txtAccount.setOnClickListener(v -> createSnackBar(view, textEmail.getText().toString(), textPassword.getText().toString()));
+
 
         //adding Notification channel
         createNotificationChannel(view);
 
         //click listener to create Notification
         TextView textNotify = view.findViewById(R.id.createNotify);
-        textNotify.setOnClickListener(v -> createNotification(savedInstanceState, view, "Dear " + textEmail.getText() + " your email has been verified and confirmed"));
+        textNotify.setOnClickListener(v -> createNotification(view, textEmail.getText().toString(), textPassword.getText().toString()));
+
 
         return view;
     }
 
-    private void createNotification(Bundle bundle, View view, String text) {
+    private void createNotification( View view, String email, String password) {
+
+        if (!email.isEmpty() && !password.isEmpty()) {
+            //inserting registration
+            Register register = new Register(email, password);
+            //inserting the registration details
+            registerViewModel.insertRegister(register);
+        }
 
         //creating an intent for the notification
         Intent dashBoardActivity = new Intent(view.getContext(), Dashboard.class);
 
         String noteTitle = "LOGIN SUCCESSFUL";
 
+        //Notifications
         NotificationCompat.Builder builder = new NotificationCompat.Builder(view.getContext(), "My Notification")
                 .setSmallIcon(R.drawable.ic_baseline_sentiment_very_dissatisfied_24)
                 .setContentTitle(noteTitle)
-                .setContentText(text)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text).setBigContentTitle(noteTitle))
+                .setContentText(email + password)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(email + password).setBigContentTitle(noteTitle))
                 .setLargeIcon(BitmapFactory.decodeResource(view.getContext().getResources(), R.drawable.email))
                 //intent for main content
                 .setContentIntent(
@@ -169,6 +186,7 @@ public class LoginFragment extends Fragment {
     //creating toast message
     @SuppressLint("SetTextI18n")
     public void createToast(View view, String email, String password) {
+
 //        Toast toast = Toast.makeText(getContext(), "Email :- "+ email + " Password :- " + password, Toast.LENGTH_LONG);
 //        toast.show();
 //        toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);//showing gravity
